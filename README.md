@@ -2,9 +2,8 @@
 
 **Applying Structural Causal Modelling to identify *why* London stores underperform — and what to do about it.**
 
-> *This project moves beyond correlation. Using Pearl's SCM, DoWhy (PyWhy), and formal refutation testing, it delivers board-ready causal evidence that is actionable, auditable, and statistically robust.*
+This project moves beyond correlation. Using Pearl's SCM, DoWhy (PyWhy), and formal refutation testing, it delivers board-ready causal evidence that is actionable, auditable, and statistically robust.*
 
----
 
 ## Project Structure
 
