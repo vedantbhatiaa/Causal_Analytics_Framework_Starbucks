@@ -110,7 +110,7 @@ DoWhy Four-Step Workflow
 
 The Structural Causal Model encodes how variables causally relate. Confounders create backdoor paths that must be blocked; mediators lie on the causal pathway and are excluded from the adjustment set.
 
-![Causal DAG](fig_03_dag.png)
+![Causal DAG](images/fig_03_dag.png)
 
 **Confounders** (block these to identify the causal effect):
 - `month` → tourist volume shifts London's review share and independently affects crowding
@@ -138,7 +138,7 @@ Two independent estimators were used for triangulation:
 
 Agreement between the two causal estimators — which make different modelling assumptions — confirms the effect is genuine.
 
-![ATE Method Comparison](fig_04_ate_comparison.png)
+![ATE Method Comparison](images/fig_04_ate_comparison.png)
 
 ### Q2 — Refutation Testing
 
@@ -152,7 +152,7 @@ Three independent stress tests validate the causal claim before it is presented 
 
 All three refutation tests passed. The London penalty is not a statistical artefact.
 
-![Refutation Test Results](fig_05_refutation.png)
+![Refutation Test Results](images/fig_05_refutation.png)
 
 ### Q3 — Mediation Analysis
 
@@ -172,7 +172,7 @@ Total Effect (TE) = Natural Direct Effect (NDE) + Natural Indirect Effect (NIE)
 
 35% of the London penalty flows through operationally fixable channels. 65% reflects direct geographic effects — crowding, reviewer demographics — harder to address.
 
-![Mediation Decomposition](fig_06_mediation.png)
+![Mediation Decomposition](images/fig_06_mediation.png)
 
 ### Q4 — Heterogeneous Treatment Effects (Seasonal)
 
@@ -190,11 +190,11 @@ The ATE is a population average. The London penalty varies substantially by mont
 
 This seasonal variation directly informs when to deploy interventions, rather than applying uniform year-round resources.
 
-![Seasonal HTE](fig_07_hte.png)
+![Seasonal HTE](images/fig_07_hte.png)
 
 ### Executive Dashboard
 
-![Board Dashboard](fig_08_dashboard.png)
+![Board Dashboard](images/fig_08_dashboard.png)
 
 ---
 
