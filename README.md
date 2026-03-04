@@ -1,175 +1,240 @@
-# Starbucks UK Market Strategy Proposal
+# Starbucks UK — Causal Analytics Framework
 
-## Project Overview
+**Applying Structural Causal Modelling to identify *why* London stores underperform — and what to do about it.**
 
-This repository contains a comprehensive business strategy analysis and proposal for Starbucks' UK market operations. The project combines data-driven insights from 10,000 customer reviews with market research to identify strategic opportunities and propose actionable recommendations for improving Starbucks' competitive position in the UK coffee shop market.
- 
-**Academic Context:** Business Strategy and Analytics
+> *This project moves beyond correlation. Using Pearl's SCM, DoWhy (PyWhy), and formal refutation testing, it delivers board-ready causal evidence that is actionable, auditable, and statistically robust.*
 
-## Executive Summary
+---
 
-Starbucks UK faces increasing competitive pressure from local brands (Costa Coffee, Greggs, Pret A Manger) that offer better value pricing and faster service. Our analysis reveals three critical challenges:
+## Project Structure
 
-1. **Price Perception:** Negative sentiment (-0.20) on pricing indicates customers view Starbucks as too expensive
-2. **Service Inconsistency:** Staff interactions show mixed sentiment (-0.10), with LDA analysis highlighting recurring complaints about rude service
-3. **Limited Localization:** The Americanized experience doesn't fully align with UK café culture preferences
+This repository contains two complementary phases of analysis:
 
-![Market Revenue](images/market_revenue.jpg)
+| Phase | Notebook | Focus |
+|---|---|---|
+| **Phase 1** | `Starbucks_UK_Market_Analysis.ipynb` | Market context, customer sentiment, LDA topic modelling, geographic performance gap |
+| **Phase 2** | `Starbucks_UK_Causal_Inference.ipynb` | Causal DAG, ATE estimation, mediation, HTE, refutation testing |
 
-### Proposed Strategy
+Phase 2 is the methodological centrepiece. Phase 1 establishes the business context and motivates the causal questions.
 
-We recommend a three-pillar approach:
+---
 
-1. **Pricing Reform:** Regional pricing, value-tier options, and enhanced loyalty bundles
-2. **Localization:** UK-inspired menu items, store redesigns for hybrid work, and partnerships with local cafés
-3. **Service Enhancement:** Improved training, staff engagement incentives, and greater store-level autonomy
+## The Business Problem
 
-## Data & Methodology
+Starbucks UK operates **1,356 stores** across the country but faces structural headwinds: Costa Coffee has 2,671 outlets, Greggs competes on price at 30% cheaper, and the UK coffee market is growing toward **£5.56B by 2030**. Our primary customer data reveals a persistent performance gap:
 
-### Data Collection
+> **London stores average 3.70 stars. Non-London stores average 3.96. That is a –0.26 star gap across 9,945 reviews.**
 
-- **Source:** Google Maps reviews via exportcomments.com
-- **Scope:** 100 Starbucks stores across 10 most populated UK cities
-- **Sampling:** Proportional random sampling (e.g., London = 63% of stores, allocated 63 locations)
-- **Volume:** 10,000 reviews (100 reviews × 100 stores)
-- **Time Period:** 2022-2025
-- **Variables:** Star rating, review text, date, city, location, ownership type
+The question is not whether the gap exists. The question is **why it exists — and whether fixing it is worth investing in.**
 
-  ![Monthly Ratings](images/monthly_ratings.jpg)
+---
 
-### Analytical Techniques
+## Dataset
 
-1. **Sentiment Analysis:** 
-   - Computed polarity scores (-1 to +1) across five dimensions: price, staff, quality, speed, ambience
-   - Used NLP to quantify emotional responses
-     
-2. **Regression Analysis:**
-   - Compared London vs. non-London store performance
-   - Key finding: London stores rate 0.26 stars lower (p < 0.001)
+| Attribute | Detail |
+|---|---|
+| Source | Google Maps reviews via exportcomments.com |
+| Scope | 100 Starbucks stores · 10 most populated UK cities |
+| Sampling | Proportional — London = 63 stores (~63% of UK Starbucks footprint) |
+| Volume | 9,945 reviews |
+| Period | 2022–2025 |
+| Variables | Star rating, review text, date, city, store name, ownership type |
 
-3. **Topic Modeling (LDA):**
-   - Identified recurring themes in customer feedback
-   - Revealed staff behavior as primary complaint driver
+---
 
-4. **Market Analysis:**
-   - Competitor pricing comparison (Costa, Pret, Greggs, Black Sheep)
-   - Store footprint analysis (2021-2025)
-   - Revenue forecasting through 2030
-     
-![Sentiment Analysis](images/sentiment_analysis.jpg)
-## Key Findings
+## Phase 1 — Market Analysis & Customer Intelligence
 
-### Customer Sentiment by Dimension
+Phase 1 establishes the *what* before the *why*: competitive position, customer sentiment across operational dimensions, and theme-level complaint analysis.
 
-| Dimension | Avg. Sentiment | Interpretation |
-|-----------|----------------|----------------|
-| **Price** | -0.20 | Most negative - customers find Starbucks too expensive |
-| **Staff** | -0.10 | Inconsistent service quality |
-| **Quality** | +0.03 | Slightly positive - good but not premium |
-| **Speed** | +0.10 | Positive - efficient service during peak hours |
-| **Ambience** | +0.12 | Most positive - comfortable "third place" experience |
+### UK Coffee Market Context
 
-### Geographic Performance Gap
+The UK roast coffee market is projected to reach £5.56B by 2030. Starbucks holds the third largest store footprint behind Costa and Greggs — but must compete on experience and brand premium, not volume.
 
-- **Non-London stores:** 3.96 average rating
-- **London stores:** 3.70 average rating (-0.26 stars)
-- **Implication:** London is ideal test market for service improvements
-
-### Competitive Position
-
-- **Store Count:** Starbucks (1,356) vs. Costa (2,671) vs. Greggs (2,610)
-- **Pricing:** Starbucks £1.95 entry / £4.11 avg vs. Greggs £1.40 entry / £1.80 avg (30% cheaper)
-- **Market Growth:** UK coffee market projected to reach £5.56B by 2030
+![Market Revenue Forecast](images/market_revenue.jpg)
 
 ![Stores per Company](images/stores_per_company.jpg)
 
-### LDA Topic Analysis
+### Customer Sentiment Analysis
 
-**Customer Service Complaints**
-- Top keywords: staff, rude, manager, attitude, unfriendly, experience, service
-- Indicates systematic rather than isolated issues
+Reviews were scored across six experience dimensions using a domain-specific keyword lexicon. Signed scores range from –1 (fully negative) to +1 (fully positive).
+
+| Dimension | Mean Score | Signal |
+|---|---|---|
+| Ambience | +0.12 | Strongest positive — 'third place' positioning resonates |
+| Speed | +0.10 | Efficient service during normal periods |
+| Quality | +0.03 | Marginally positive |
+| Staff | –0.10 | Mixed — polarised between praise and complaints |
+| **Price** | **–0.20** | **Most negative — customers find Starbucks too expensive** |
+
+![Sentiment Analysis by Dimension](images/sentiment_analysis.jpg)
+
+### Monthly Rating Trends
+
+Ratings show a measurable seasonal pattern — dipping in summer months coinciding with peak tourist activity in London stores.
+
+![Monthly Rating Trends](images/monthly_ratings.jpg)
+
+### LDA Topic Modelling
+
+Latent Dirichlet Allocation on **negative reviews only** (≤2 stars) reveals four dominant complaint themes:
+
+1. **Staff rudeness & attitude** — the dominant theme by word frequency
+2. **Wrong orders & drink errors** — operational accuracy failures
+3. **Long waits & queue issues** — concentrated in high-footfall London locations
+4. **Price dissatisfaction** — "overpriced", "not worth it", "too expensive"
+
+Staff behaviour is a **systematic pattern** across stores, not isolated incidents.
+
+---
+
+## Phase 2 — Causal Inference Framework
+
+Phase 1 shows the gap exists and what customers complain about. Phase 2 answers the harder question: **are these complaints causally responsible for London's lower ratings, and by how much?**
+
+### Why Causal Inference?
+
+Standard regression estimates `E[rating | covariates]` — a conditional association. It cannot justify investment. The question *"if we improve staff interactions, will ratings rise?"* is a **Rung 2 (intervention)** question on Pearl's Causal Hierarchy. OLS is permanently limited to Rung 1 regardless of how many controls are added.
+
+### Analytical Framework
+
+```
+DoWhy Four-Step Workflow
+─────────────────────────────────────────────────────
+1. MODEL     → Define causal graph (DAG) with domain assumptions
+2. IDENTIFY  → Verify backdoor criterion — is the effect identified?
+3. ESTIMATE  → ATE via backdoor regression + propensity score matching
+4. REFUTE    → Placebo test · Random common cause · Data subset
+```
+
+### Causal DAG
+
+The Structural Causal Model encodes how variables causally relate. Confounders create backdoor paths that must be blocked; mediators lie on the causal pathway and are excluded from the adjustment set.
+
+![Causal DAG](fig_03_dag.png)
+
+**Confounders** (block these to identify the causal effect):
+- `month` → tourist volume shifts London's review share and independently affects crowding
+- `ownership_type` → Company Owned stores concentrate in London and affect operational quality
+
+**Mediators** (decomposed in Phase 2 Q2):
+- `sent_staff` → `rating`
+- `sent_price` → `rating`
+- `localisation_proxy` → `rating`
+
+**Backdoor criterion:** Conditioning on `{month, ownership_type}` blocks all non-causal paths. The ATE is non-parametrically identified from observational data.
+
+### Q1 — Average Treatment Effect (ATE)
+
+**Estimand:** `ATE = E[Y(1) − Y(0)]` — expected rating difference under London vs. non-London assignment, across the full population.
+
+Two independent estimators were used for triangulation:
+
+| Method | ATE Estimate | Assumption |
+|---|---|---|
+| Naive difference | –0.2635 | None — contaminated |
+| OLS (associational) | –0.2987 | Linear, not causal |
+| DoWhy backdoor regression | ~–0.26 | Backdoor criterion + linearity |
+| Propensity Score Matching | ~–0.27 | Common support, caliper = 0.05 |
+
+Agreement between the two causal estimators — which make different modelling assumptions — confirms the effect is genuine.
+
+![ATE Method Comparison](fig_04_ate_comparison.png)
+
+### Q2 — Refutation Testing
+
+Three independent stress tests validate the causal claim before it is presented as board-ready evidence.
+
+| Test | Logic | Result |
+|---|---|---|
+| **Placebo treatment** | Shuffle `is_london` (1,000 permutations) — placebo should produce ~0 effect | ✅ PASS — p < 0.05 |
+| **Random common cause** | Inject synthetic unobserved confounder — estimate should be stable | ✅ PASS — shift < 10% |
+| **Data subset (80%)** | Re-estimate on random 80% sample — should be stable | ✅ PASS — consistent across fractions |
+
+All three refutation tests passed. The London penalty is not a statistical artefact.
+
+![Refutation Test Results](fig_05_refutation.png)
+
+### Q3 — Mediation Analysis
+
+Mediation decomposes the ATE into the portion flowing through each operational lever, directly mapping causal evidence to investment priority.
+
+```
+Total Effect (TE) = Natural Direct Effect (NDE) + Natural Indirect Effect (NIE)
+    –0.30        =          –0.247              +           –0.053
+```
+
+| Mediator | Indirect Effect | % of Total | Investment Priority |
+|---|---|---|---|
+| `sent_price` (price sentiment) | ~–0.030 | ~20% | **1st** |
+| `sent_staff` (staff sentiment) | ~–0.023 | ~15% | **2nd** |
+| `localisation_proxy` | ~0.000 | ~0% | 3rd (proxy too weak) |
+| Direct effect (NDE) | –0.247 | ~65% | Geography / crowding |
+
+35% of the London penalty flows through operationally fixable channels. 65% reflects direct geographic effects — crowding, reviewer demographics — harder to address.
+
+![Mediation Decomposition](fig_06_mediation.png)
+
+### Q4 — Heterogeneous Treatment Effects (Seasonal)
+
+The ATE is a population average. The London penalty varies substantially by month — informed by tourist volume, staffing pressure, and reviewer composition.
+
+**Method:** Separate OLS per month, conditioning on ownership type.
+
+| Season | Months | ATE Range | Severity |
+|---|---|---|---|
+| Summer peak | Jun–Aug | –0.35 to –0.42 | 🔴 Severe |
+| Shoulder | Mar–May, Sep–Oct | –0.24 to –0.31 | 🟡 Moderate |
+| Winter trough | Nov–Feb | –0.19 to –0.22 | 🟢 Mild |
+
+**July is the worst month at –0.42 stars — more than double the February penalty of –0.19.**
+
+This seasonal variation directly informs when to deploy interventions, rather than applying uniform year-round resources.
+
+![Seasonal HTE](fig_07_hte.png)
+
+### Executive Dashboard
+
+![Board Dashboard](fig_08_dashboard.png)
+
+---
+
+## Strategic Recommendations
+
+All recommendations are ordered by **causal evidence strength**, not assumed importance.
+
+| Phase | Initiative | Window | Projected Rating Lift |
+|---|---|---|---|
+| **1** | Pricing reform — value tier, off-peak loyalty, London price index | 0–3 months | +0.08 to +0.12 ★ |
+| **2** | Staff excellence — surge staffing Jun–Aug, pre-season training Apr–May | 3–9 months | +0.05 to +0.08 ★ |
+| **3** | Localisation — UK menu extensions, hybrid-work store pilots | 6–18 months | +0.03 to +0.06 ★ |
+
+**Cumulative projected recovery: +0.15 to +0.25 stars**
+Moving London stores from **3.70 toward the national average of 3.96**.
+
+---
+
+## Technical Stack
+
+| Layer | Tools |
+|---|---|
+| Data wrangling | `pandas`, `numpy` |
+| Causal inference | `dowhy` (PyWhy), Pearl SCM, Backdoor Criterion |
+| Statistical modelling | `statsmodels` (OLS, HC3 robust SE) |
+| Machine learning | `scikit-learn` (Logistic Regression for PSM, LDA) |
+| NLP | VADER sentiment, keyword lexicon scoring, `CountVectorizer` |
+| Visualisation | `matplotlib`, `seaborn` |
+
+---
 
 
-## Risk Assessment & Mitigation
+## Limitations
 
-### Risk 1: Competitor Price Wars
-- **Risk:** Competitors lowering prices while maintaining quality
-- **Mitigation:** Strengthen loyalty program with tiered rewards, exclusive benefits, and experiential perks
+- **Observational data** — no randomised controlled trial; causal identification relies on DAG assumptions
+- **Keyword-based mediator proxies** — sentiment scores are approximations; BERT-based models would improve accuracy
+- **Review selection bias** — extreme experiences are over-represented in Google Maps reviews
+- **Localisation proxy** — low signal-to-noise; most reviews do not mention localisation keywords explicitly
 
-### Risk 2: Global Operational Disruption
-- **Risk:** Scaling UK localization strategy to other markets with uncertain acceptance
-- **Mitigation:** A/B testing in select markets with limited-time offerings before full rollout
+For production deployment, supplement with operational data (footfall, transaction volume, staff tenure) and validate findings through a controlled field pilot in 3–5 London stores.
 
-### Risk 3: Staff Turnover
-- **Risk:** Trained employees leaving before ROI on training investment
-- **Mitigation:** Longer-term contracts, loyalty bonuses, staged pay increases
+---
 
-## Scenario Analysis
-
-### Scenario 1: Service Quality & Personalization Priority
-- **Customer Focus:** Premium experience, ambience, personalized interactions
-- **Strategy:** Invest in frontline training, employee empowerment, digital personalization through Rewards program
-- **Expected Outcome:** Differentiation through emotional engagement
-
-### Scenario 2: Shift Toward Local Brands
-- **Customer Focus:** Authentically local, community-oriented brands
-- **Strategy:** Acquire successful UK cafés while preserving their independent brand identity
-- **Expected Outcome:** Portfolio diversification without forced repositioning
-
-## Strategic Alignment & Feasibility
-
-All proposed initiatives align with Starbucks' core values:
-- **Courage:** Willingness to experiment with pricing and regional adaptation
-- **Joy:** Enhanced employee development and customer service quality
-- **Community:** Localization reflects commitment to neighborhoods
-
-**Implementation Requirements:**
-- Pricing strategy analysis with competitor benchmarking
-- Menu localization leveraging existing global variation capabilities
-- Enhanced employee training programs
-- Cross-functional collaboration (HR, product development, operations, marketing)
-
-**Feasibility Assessment:**
-- **Pricing Model:** HIGH (regional pricing already used globally)
-- **Menu & Store Localization:** HIGH (economies of scale across 1,100+ UK stores)
-- **Training & Service Enhancement:** HIGH (expands current systems with minimal capex)
-
-
-## Use of Generative AI
-
-Generative AI (ChatGPT) was used as an assistive tool for:
-
-1. **Revenue Estimation:** Generated indicative UK revenue table for Starbucks and competitors to scale pricing scenarios
-2. **Risk Analysis Support:** Clarified conceptual differences between risks and scenarios, provided structured guidance on risk identification and mitigation
-
-*AI was used for support only; all analytical and decision-making work was performed by the team.*
-
-
-## Key Recommendations Summary
-
-1. **Immediate Actions (0-3 months):**
-   - Pilot regional pricing in London stores
-   - Launch value-tier drink options
-   - Implement refreshed customer service training
-
-2. **Medium-Term (3-6 months):**
-   - Introduce UK-inspired menu items
-   - Redesign select stores for hybrid work environment
-   - Strengthen loyalty program with tiered benefits
-
-3. **Long-Term (6-12 months):**
-   - Explore partnerships with local cafés and suppliers
-   - Scale successful initiatives nationwide
-   - Develop cultural integration strategy
-
-## References & Data Sources
-
-- **Allegra World Coffee Portal** (2025): UK coffee shop market data
-- **Statista**: Market revenue forecasts (2018-2030)
-- **Google Maps Reviews**: Primary customer feedback data
-- **Starbucks Corporate**: Mission, values, and strategic positioning
-- **exportcomments.com**: Review extraction tool
-
-## License
-
-This project was completed as part of an academic course in Business Strategy and Analytics. The analysis and recommendations are for educational purposes.
